@@ -1,0 +1,61 @@
+﻿<Window x:Class="FolderDeepSearch.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FolderDeepSearch"
+        xmlns:Converters="clr-namespace:FolderDeepSearch.Converters" 
+        xmlns:search="clr-namespace:FolderDeepSearch.Search"
+        mc:Ignorable="d"
+        Title="MainWindow" 
+        Height="600" Width="600"
+        MinWidth="375" MinHeight="350"
+        Style="{DynamicResource CustomWindowStyle}">
+    <Window.Resources>
+        <Converters:MultiBoolToEnumConverter x:Key="MultiBoolToEnumConverter"/>
+    </Window.Resources>
+    <Grid Margin="10">
+        <StackPanel Grid.Row="0" Height="103" VerticalAlignment="Top">
+            <Grid Margin="0,0,0,5" Height="26" VerticalAlignment="Top">
+                <Label Content="Search for:" HorizontalAlignment="Left" Width="70" Padding="0 5 5 5"/>
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="The string of text to be searched" Height="26" Margin="70,0,105,0" TextWrapping="Wrap" Padding="3" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                <Button Command="{Binding FindCommand}" Content="Search" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="26"/>
+            </Grid>
+            <Grid Margin="0,0,0,5" Height="26" VerticalAlignment="Top">
+                <Label Content="Start Folder:" HorizontalAlignment="Left" Width="70" Padding="0 5 5 5"/>
+                <TextBox Text="{Binding ToBeSearchedDirectory, UpdateSourceTrigger=PropertyChanged}" ToolTip="The directory to search through" TextWrapping="Wrap" Padding="3" VerticalContentAlignment="Center" Margin="70,0,130,0"/>
+                <Button Command="{Binding SelectFolderCommand}" Content="..." HorizontalAlignment="Right" Width="25" BorderThickness="0 1 1 1" Margin="0,0,105,0"/>
+                <Button Command="{Binding CancelSearchCommand}" IsEnabled="{Binding IsSearching, UpdateSourceTrigger=PropertyChanged}" Content="Cancel Search" HorizontalAlignment="Right" Width="100"/>
+            </Grid>
+            <Grid Margin="0,0,0,0" Height="25" VerticalAlignment="Top">
+                <Label Content="Searching for:" HorizontalAlignment="Left" Padding="0 0 5 0" VerticalContentAlignment="Center"/>
+                <RadioButton IsChecked="{Binding SearchPreferences, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MultiBoolToEnumConverter}, ConverterParameter=Folder}" ToolTip="Search for a specific folder name" Content="Folders" HorizontalAlignment="Left" Margin="83,0,0,0" Height="Auto"/>
+                <RadioButton IsChecked="{Binding SearchPreferences, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MultiBoolToEnumConverter}, ConverterParameter=File}" ToolTip="Search for a specific file name" Content="Files" HorizontalAlignment="Left" Margin="145,0,0,0" Height="Auto"/>
+                <RadioButton IsChecked="{Binding SearchPreferences, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MultiBoolToEnumConverter}, ConverterParameter=FileContents}" ToolTip="Search for text in every single file" Content="File Contents" HorizontalAlignment="Left" Margin="192,0,0,0" Height="Auto"/>
+                <RadioButton IsChecked="{Binding SearchPreferences, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource MultiBoolToEnumConverter}, ConverterParameter=All}" ToolTip="Search for text in every single file" Content="Any/All" HorizontalAlignment="Left" Margin="285,0,0,0" Height="Auto"/>
+            </Grid>
+            <Grid Margin="0,0,0,5" Height="16" VerticalAlignment="Top">
+                <CheckBox IsChecked="{Binding IsCaseSensitive, UpdateSourceTrigger=PropertyChanged}" ToolTip="Match the CAPTIALS and lowercase letters with the folder/file/contents being searched" Content="Case Sensitive" VerticalAlignment="Top" HorizontalAlignment="Left" Height="16"/>
+                <CheckBox IsChecked="{Binding SearchRecursively, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search though every subfolder (search the folder for folders with folders etc)" Content="Search Recursively" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="99,0,0,0" Height="16"/>
+            </Grid>
+        </StackPanel>
+        <Separator VerticalAlignment="Top" Margin="0,108,0,0"/>
+        <Grid Margin="0,114,0,25">
+            <Label Content="Results:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <ListBox Margin="0,26,0,0"
+                     ItemsSource="{Binding FindResults, UpdateSourceTrigger=PropertyChanged}"
+                     HorizontalContentAlignment="Stretch"
+                     ScrollViewer.CanContentScroll="False">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <search:SearchResultControl DataContext="{Binding}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Command="{Binding ClearResultsCommand}" Content="Clear Results" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,0,0" VerticalAlignment="Top" Width="100" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}"/>
+        </Grid>
+        <Grid VerticalAlignment="Bottom" Height="20">
+            <ProgressBar IsIndeterminate="{Binding IsSearching, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </Grid>
+</Window>

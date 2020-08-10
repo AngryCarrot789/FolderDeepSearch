@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="FolderDeepSearch.Search.SearchResultControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FolderDeepSearch.Search"
+             xmlns:Converters="clr-namespace:FolderDeepSearch.Converters" xmlns:controls="clr-namespace:FolderDeepSearch.Controls"
+             mc:Ignorable="d" 
+             Height="40" d:DesignWidth="600" Foreground="{DynamicResource ControlDefaultForeground}">
+    <UserControl.Resources>
+        <Converters:IconToImageConverter x:Key="IconToImageConverter"/>
+        <Converters:FileSizeFormatConverter x:Key="FileSizeFormatConverter"/>
+        <Converters:FileNameToExtensionConverter x:Key="FileNameToExtensionConverter"/>
+    </UserControl.Resources>
+    <Grid Background="Transparent" MouseDown="Grid_MouseDown">
+        <Image Source="{Binding Icon, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IconToImageConverter}}" HorizontalAlignment="Left" Width="32" Margin="0 4"/>
+        <controls:HighlightableTextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Selection="{Binding SelectedText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MouseDown="TextBlock_MouseDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="37,0,95,0" FontWeight="Bold" TextDecorations="{x:Null}" Cursor="Hand"/>
+        <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileNameToExtensionConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="40"/>
+        <TextBlock Text="{Binding SizeBytes, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileSizeFormatConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="50" Margin="0,0,40,0"/>
+        <TextBlock Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="37,0,0,0"/>
+    </Grid>
+</UserControl>
