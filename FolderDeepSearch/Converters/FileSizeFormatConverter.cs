@@ -19,14 +19,14 @@ namespace FolderDeepSearch.Converters
             if (value is long size)
             {
                 if (size == long.MaxValue)
-                    return "-";
+                    return "";
 
                 StringBuilder sb = new StringBuilder(20);
                 StrFormatByteSize(size, sb, 20);
                 return sb.ToString();
             }
 
-            return "-";
+            return "";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

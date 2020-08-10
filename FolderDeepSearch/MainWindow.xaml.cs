@@ -1,5 +1,6 @@
 ﻿using FolderDeepSearch.ViewModels;
 using System.Windows;
+using TheRThemes;
 
 namespace FolderDeepSearch
 {
@@ -11,7 +12,31 @@ namespace FolderDeepSearch
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
+            Closing += MainWindow_Closing;
             DataContext = new MainViewModel();
+        }
+
+        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            try
+            {
+                string themeName = ThemesController.CurrentTheme == ThemesController.ThemeTypes.Dark ? "D" : "L";
+                Properties.Settings.Default.ThemeName = themeName;
+                Properties.Settings.Default.Save();
+            }
+            catch { }
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(Properties.Settings.Default.ThemeName)) ThemesController.SetTheme(ThemesController.ThemeTypes.Light);
+                else if (Properties.Settings.Default.ThemeName == "D") ThemesController.SetTheme(ThemesController.ThemeTypes.Dark);
+                else if (Properties.Settings.Default.ThemeName == "L") ThemesController.SetTheme(ThemesController.ThemeTypes.Light);
+            }
+            catch { }
         }
     }
 }

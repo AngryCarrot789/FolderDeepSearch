@@ -2,14 +2,18 @@
 using FolderDeepSearch.Search;
 using FolderDeepSearch.Utilities;
 using Ookii.Dialogs.Wpf;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
+using TheRThemes;
 
 namespace FolderDeepSearch.ViewModels
 {
@@ -59,26 +63,72 @@ namespace FolderDeepSearch.ViewModels
 
         public bool CanSearch { get; set; }
 
+        const int FileMaxReadSize = 1024; // read the file by chunks of 1KB
+
         public ObservableCollection<SearchResultViewModel> FindResults { get; set; }
 
         public ICommand ClearResultsCommand { get; }
         public ICommand FindCommand { get; }
         public ICommand SelectFolderCommand { get; }
         public ICommand CancelSearchCommand { get; }
+        public ICommand SetThemeCommand { get; }
+        public ICommand ExportFilesToFolderCommand { get; }
+        public ICommand SortFilesCommand { get; }
 
         public MainViewModel()
         {
             FindResults = new ObservableCollection<SearchResultViewModel>();
 
+            SortFilesCommand = new Command(SortItemsByNameAndType);
+            ExportFilesToFolderCommand = new Command(ExportFilesToFolder);
+            SetThemeCommand = new CommandParam<string>(SetTheme);
             CancelSearchCommand = new Command(CancelSearch);
             SelectFolderCommand = new Command(SelectFolderToBeSearched);
             FindCommand = new Command(Find);
             ClearResultsCommand = new Command(ClearResults);
         }
 
+        public void SortItemsByNameAndType()
+        {
+            List<SearchResultViewModel> sorted = FindResults.OrderBy(a => a.Name).ToList().OrderBy(a => a.Type).ToList();
+            ClearResults();
+            foreach(SearchResultViewModel result in sorted)
+            {
+                AddResult(result);
+            }
+        }
+
+        public void ExportFilesToFolder()
+        {
+            VistaFolderBrowserDialog fbd = new VistaFolderBrowserDialog();
+            fbd.UseDescriptionForTitle = true;
+            fbd.Description = "Select a directory for the found FILES (not folders) to be copied to";
+            if (fbd.ShowDialog() == true)
+            {
+                if (fbd.SelectedPath.IsDirectory())
+                {
+                    foreach(SearchResultViewModel result in FindResults)
+                    {
+                        if (result.Path.IsFile())
+                        {
+                            File.Copy(result.Path, Path.Combine(fbd.SelectedPath, result.Name));
+                        }
+                    }
+                }    
+                else MessageBox.Show("Seletced folder does not exist");
+            }
+        }
+
+        public void SetTheme(string themeLetter)
+        {
+            if (themeLetter == "l") ThemesController.SetTheme(ThemesController.ThemeTypes.Light);
+            if (themeLetter == "d") ThemesController.SetTheme(ThemesController.ThemeTypes.Dark);
+        }
+
         public void SelectFolderToBeSearched()
         {
             VistaFolderBrowserDialog fbd = new VistaFolderBrowserDialog();
+            fbd.UseDescriptionForTitle = true;
             fbd.Description = "Select a directory to be searched";
             if (fbd.ShowDialog() == true)
             {
@@ -100,6 +150,8 @@ namespace FolderDeepSearch.ViewModels
             CanSearch = false;
         }
 
+        // This method is absolutely huge ik but i cant
+        // be bothered to split it up into smaller ones lol
         public void Find()
         {
             CancelSearch();
@@ -132,12 +184,20 @@ namespace FolderDeepSearch.ViewModels
                                         {
                                             if (!CanSearch) return;
 
-                                            string fileText = File.ReadAllText(filename);
-                                            if (!IsCaseSensitive)
-                                                fileText = fileText.ToLower();
-                                            if (fileText.Contains(searchText))
+                                            using (FileStream fileStream = File.OpenRead(filename))
                                             {
-                                                ResultsFoundAsync(filename, searchText);
+                                                int bytesRead;
+                                                byte[] buffer = new byte[FileMaxReadSize];
+                                                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                                                {
+                                                    if (!CanSearch) return;
+                                                    string text = Encoding.ASCII.GetString(buffer);
+                                                    if ((IsCaseSensitive ? text : text.ToLower()).Contains(searchText))
+                                                    {
+                                                        ResultsFoundAsync(filename, searchText);
+                                                        break;
+                                                    }
+                                                }
                                             }
                                         }
 
@@ -151,12 +211,20 @@ namespace FolderDeepSearch.ViewModels
                                 {
                                     if (!CanSearch) return;
 
-                                    string fileText = File.ReadAllText(filename);
-                                    if (!IsCaseSensitive)
-                                        fileText = fileText.ToLower();
-                                    if (fileText.Contains(searchText))
+                                    using (FileStream fileStream = File.OpenRead(filename))
                                     {
-                                        ResultsFoundAsync(filename, searchText);
+                                        int bytesRead;
+                                        byte[] buffer = new byte[FileMaxReadSize];
+                                        while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                                        {
+                                            if (!CanSearch) return;
+                                            string text = Encoding.ASCII.GetString(buffer);
+                                            if ((IsCaseSensitive ? text : text.ToLower()).Contains(searchText))
+                                            {
+                                                ResultsFoundAsync(filename, searchText);
+                                                break;
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -234,14 +302,22 @@ namespace FolderDeepSearch.ViewModels
                                                 hasFoundFile = true;
                                             }
 
-                                            string fileText = File.ReadAllText(filename);
-                                            if (!IsCaseSensitive)
-                                                fileText = fileText.ToLower();
-                                            if (fileText.Contains(searchText))
+                                            if (!hasFoundFile)
                                             {
-                                                if (!hasFoundFile)
+                                                using (FileStream fileStream = File.OpenRead(filename))
                                                 {
-                                                    ResultsFoundAsync(filename, searchText);
+                                                    int bytesRead;
+                                                    byte[] buffer = new byte[FileMaxReadSize];
+                                                    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                                                    {
+                                                        if (!CanSearch) return;
+                                                        string text = Encoding.ASCII.GetString(buffer);
+                                                        if ((IsCaseSensitive ? text : text.ToLower()).Contains(searchText))
+                                                        {
+                                                            ResultsFoundAsync(filename, searchText);
+                                                            break;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -263,14 +339,22 @@ namespace FolderDeepSearch.ViewModels
                                         hasFoundFile = true;
                                     }
 
-                                    string fileText = File.ReadAllText(filename);
-                                    if (!IsCaseSensitive)
-                                        fileText = fileText.ToLower();
-                                    if (fileText.Contains(searchText))
+                                    if (!hasFoundFile)
                                     {
-                                        if (!hasFoundFile)
+                                        using (FileStream fileStream = File.OpenRead(filename))
                                         {
-                                            ResultsFoundAsync(filename, searchText);
+                                            int bytesRead;
+                                            byte[] buffer = new byte[FileMaxReadSize];
+                                            while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                                            {
+                                                if (!CanSearch) return;
+                                                string text = Encoding.ASCII.GetString(buffer);
+                                                if ((IsCaseSensitive ? text : text.ToLower()).Contains(searchText))
+                                                {
+                                                    ResultsFoundAsync(filename, searchText);
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -308,12 +392,20 @@ namespace FolderDeepSearch.ViewModels
                                     {
                                         if (!CanSearch) return;
 
-                                        string fileText = File.ReadAllText(file);
-                                        if (!IsCaseSensitive)
-                                            fileText = fileText.ToLower();
-                                        if (fileText.Contains(searchText))
+                                        using (FileStream fileStream = File.OpenRead(file))
                                         {
-                                            ResultsFoundAsync(file, searchText);
+                                            int bytesRead;
+                                            byte[] buffer = new byte[FileMaxReadSize];
+                                            while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                                            {
+                                                if (!CanSearch) return;
+                                                string text = Encoding.ASCII.GetString(buffer);
+                                                if ((IsCaseSensitive ? text : text.ToLower()).Contains(searchText))
+                                                {
+                                                    ResultsFoundAsync(file, searchText);
+                                                    break;
+                                                }
+                                            }
                                         }
                                     }
                                     break;
@@ -342,14 +434,22 @@ namespace FolderDeepSearch.ViewModels
                                             hasFoundFile = true;
                                         }
 
-                                        string fileText = File.ReadAllText(file);
-                                        if (!IsCaseSensitive)
-                                            fileText = fileText.ToLower();
-                                        if (fileText.Contains(searchText))
+                                        if (!hasFoundFile)
                                         {
-                                            if (!hasFoundFile)
+                                            using (FileStream fileStream = File.OpenRead(file))
                                             {
-                                                ResultsFoundAsync(file, searchText);
+                                                int bytesRead;
+                                                byte[] buffer = new byte[FileMaxReadSize];
+                                                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                                                {
+                                                    if (!CanSearch) return;
+                                                    string text = Encoding.ASCII.GetString(buffer);
+                                                    if ((IsCaseSensitive ? text : text.ToLower()).Contains(searchText))
+                                                    {
+                                                        ResultsFoundAsync(file, searchText);
+                                                        break;
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -381,14 +481,10 @@ namespace FolderDeepSearch.ViewModels
         public SearchResultViewModel CreateResultFromPath(string path, string selectionText)
         {
             if (path.IsFile())
-            {
                 return Fetcher.CreateResultFromFile(path, selectionText);
-            }
 
             else if (path.IsDirectory())
-            {
                 return Fetcher.CreateResultFromFolder(path, selectionText);
-            }
 
             else return null;
         }

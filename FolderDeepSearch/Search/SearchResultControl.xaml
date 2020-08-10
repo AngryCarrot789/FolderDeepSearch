@@ -14,9 +14,9 @@
     </UserControl.Resources>
     <Grid Background="Transparent" MouseDown="Grid_MouseDown">
         <Image Source="{Binding Icon, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IconToImageConverter}}" HorizontalAlignment="Left" Width="32" Margin="0 4"/>
-        <controls:HighlightableTextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Selection="{Binding SelectedText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MouseDown="TextBlock_MouseDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="37,0,95,0" FontWeight="Bold" TextDecorations="{x:Null}" Cursor="Hand"/>
-        <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileNameToExtensionConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="40"/>
-        <TextBlock Text="{Binding SizeBytes, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileSizeFormatConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="50" Margin="0,0,40,0"/>
-        <TextBlock Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="37,0,0,0"/>
+        <controls:HighlightableTextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Selection="{Binding SelectedText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MouseDown="TextBlock_MouseDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="37,1,95,0" FontWeight="Bold" TextDecorations="{x:Null}" Cursor="Hand"/>
+        <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileNameToExtensionConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="40" Margin="0,1,0,0"/>
+        <TextBlock Text="{Binding SizeBytes, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileSizeFormatConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="50" Margin="0,1,40,0"/>
+        <TextBlock Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="37,0,0,1"/>
     </Grid>
 </UserControl>

@@ -13,7 +13,7 @@ namespace FolderDeepSearch.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value is string fileName ? Path.GetExtension(fileName) : "*";
+            return value is string fileName ? Path.GetExtension(fileName) : "Folder";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

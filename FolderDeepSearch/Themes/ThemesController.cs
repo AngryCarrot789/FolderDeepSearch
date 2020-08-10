@@ -8,8 +8,8 @@ namespace TheRThemes
     {
         public enum ThemeTypes
         {
-            Light, ColourfulLight,
-            Dark, ColourfulDark
+            Light,
+            Dark,
         }
 
         public static ThemeTypes CurrentTheme { get; set; }
@@ -39,8 +39,6 @@ namespace TheRThemes
             {
                 case ThemeTypes.Dark: themeName = "DarkTheme"; break;
                 case ThemeTypes.Light: themeName = "LightTheme"; break;
-                case ThemeTypes.ColourfulDark: themeName = "ColourfulDarkTheme"; break;
-                case ThemeTypes.ColourfulLight: themeName = "ColourfulLightTheme"; break;
             }
 
             try

@@ -8,6 +8,6 @@ namespace FolderDeepSearch.Files
 {
     public enum FileType
     {
-        File, Folder
+        Folder, File
     }
 }
