@@ -19,12 +19,12 @@
         <StackPanel Grid.Row="0" Height="107" VerticalAlignment="Top">
             <Grid Margin="0,0,0,5" Height="26" VerticalAlignment="Top">
                 <Label Content="Search for:" HorizontalAlignment="Left" Width="70" Padding="0 5 5 5"/>
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="The string of text to be searched" Height="26" Margin="70,0,105,0" TextWrapping="Wrap" Padding="3" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="The string of text to be searched" Height="26" Margin="70,0,105,0" TextWrapping="NoWrap" Padding="3" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
                 <Button Command="{Binding FindCommand}" Content="Search" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="26" ToolTip="Search for the specific string of text (to the right)"/>
             </Grid>
             <Grid Margin="0,0,0,5" Height="26" VerticalAlignment="Top">
                 <Label Content="Start Folder:" HorizontalAlignment="Left" Width="70" Padding="0 5 5 5"/>
-                <TextBox Text="{Binding ToBeSearchedDirectory, UpdateSourceTrigger=PropertyChanged}" ToolTip="The directory to search through" TextWrapping="Wrap" Padding="3" VerticalContentAlignment="Center" Margin="70,0,130,0"/>
+                <TextBox Text="{Binding SearchStartFolder, UpdateSourceTrigger=PropertyChanged}" ToolTip="The directory to search through" TextWrapping="NoWrap" Padding="3" VerticalContentAlignment="Center" Margin="70,0,130,0"/>
                 <Button Command="{Binding SelectFolderCommand}" Content="..." HorizontalAlignment="Right" Width="25" BorderThickness="0 1 1 1" Margin="0,0,105,0"/>
                 <Button Command="{Binding CancelSearchCommand}" IsEnabled="{Binding IsSearching, UpdateSourceTrigger=PropertyChanged}" Content="Cancel Search" HorizontalAlignment="Right" Width="100"/>
             </Grid>
@@ -35,11 +35,12 @@
                         <RadioButton IsChecked="{Binding SearchPreferences, ConverterParameter=Folder, Converter={StaticResource MultiBoolToEnumConverter}, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search for a specific folder name" Content="Folders" HorizontalAlignment="Left" Margin="83,0,0,0" Height="Auto"/>
                         <RadioButton IsChecked="{Binding SearchPreferences, ConverterParameter=File, Converter={StaticResource MultiBoolToEnumConverter}, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search for a specific file name" Content="Files" HorizontalAlignment="Left" Margin="145,0,0,0" Height="Auto"/>
                         <RadioButton IsChecked="{Binding SearchPreferences, ConverterParameter=FileContents, Converter={StaticResource MultiBoolToEnumConverter}, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search for text in every single file" Content="File Contents" HorizontalAlignment="Left" Margin="192,0,0,0" Height="Auto"/>
-                        <RadioButton IsChecked="{Binding SearchPreferences, ConverterParameter=All, Converter={StaticResource MultiBoolToEnumConverter}, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search for text in every single file" Content="Any/All" HorizontalAlignment="Left" Margin="285,0,0,0" Height="Auto"/>
+                        <RadioButton IsChecked="{Binding SearchPreferences, ConverterParameter=All, Converter={StaticResource MultiBoolToEnumConverter}, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search through folder names, file names and file contents" Content="Any/All" HorizontalAlignment="Left" Margin="285,0,0,0" Height="Auto"/>
                     </Grid>
                     <Grid Margin="0,25,0,0" Height="20" VerticalAlignment="Top">
                         <CheckBox IsChecked="{Binding IsCaseSensitive, UpdateSourceTrigger=PropertyChanged}" ToolTip="Match the CAPTIALS and lowercase letters with the folder/file/contents being searched" Content="Case Sensitive" HorizontalAlignment="Left" Height="Auto"/>
-                        <CheckBox IsChecked="{Binding SearchRecursively, UpdateSourceTrigger=PropertyChanged}" ToolTip="Search though every subfolder (search the folder for folders with folders etc)" Content="Search Recursively" HorizontalAlignment="Left" Margin="99,0,0,0" Height="Auto"/>
+                        <CheckBox IsChecked="{Binding SearchRecursively, UpdateSourceTrigger=PropertyChanged}" ToolTip="If enabled, search every subfolder for subfolders with subfolders until there's no more subfolders." Content="Search Recursively" HorizontalAlignment="Left" Margin="99,0,0,0" Height="Auto"/>
+                        <CheckBox IsChecked="{Binding IgnoreExtension, UpdateSourceTrigger=PropertyChanged}" ToolTip="If this is enabled, the search wont look for file extensions (.txt, .xml, etc)" Content="Ignore File Extension" Margin="220,0,0,0" Height="Auto"/>
                     </Grid>
                 </Grid>
                 <Grid HorizontalAlignment="Right" Margin="0,1,0,0" Width="105">
@@ -59,6 +60,7 @@
             <ListBox Margin="0,26,0,0"
                      ItemsSource="{Binding FindResults, UpdateSourceTrigger=PropertyChanged}"
                      HorizontalContentAlignment="Stretch"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                      ScrollViewer.CanContentScroll="False">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -66,7 +68,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button Command="{Binding SortFilesCommand}" Content="Sort Items" ToolTip="Sort the items firstly by their name and then by the type (folders at top, files at bottom)" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,260,0" VerticalAlignment="Top" Width="100" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}"/>
+            <Button Command="{Binding SortFilesCommand}" IsEnabled="{Binding IsSorting, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}" Content="Sort Items" ToolTip="Sort items by their name and then sort folders at top" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,260,0" VerticalAlignment="Top" Width="100" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}"/>
             <Button Command="{Binding ExportFilesToFolderCommand}" Content="Export Results to Folder" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,105,0" VerticalAlignment="Top" Width="150" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}" ToolTip="Copies all of the files found to a folder"/>
             <Button Command="{Binding ClearResultsCommand}" Content="Clear Results" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,0,0" VerticalAlignment="Top" Width="100" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}" ToolTip="Clear all of the results/items below"/>
         </Grid>

@@ -34,7 +34,7 @@ namespace FolderDeepSearch.Files
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Failed to create file: {e.Message}", "Error"); 
+                //MessageBox.Show($"Failed to create file: {e.Message}", "Error"); 
                 return null;
             }
         }
@@ -61,7 +61,7 @@ namespace FolderDeepSearch.Files
             }
             catch (Exception e)
             {
-                MessageBox.Show($"Failed to create folder: {e.Message}", "Error");
+                //MessageBox.Show($"Failed to create folder: {e.Message}", "Error");
                 return null;
             }
         }

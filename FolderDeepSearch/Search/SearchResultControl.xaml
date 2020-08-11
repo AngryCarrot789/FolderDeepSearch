@@ -4,19 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FolderDeepSearch.Search"
-             xmlns:Converters="clr-namespace:FolderDeepSearch.Converters" xmlns:controls="clr-namespace:FolderDeepSearch.Controls"
+             xmlns:Converters="clr-namespace:FolderDeepSearch.Converters" 
+             xmlns:controls="clr-namespace:FolderDeepSearch.Controls"
              mc:Ignorable="d" 
-             Height="40" d:DesignWidth="600" Foreground="{DynamicResource ControlDefaultForeground}">
+             Height="40" d:DesignWidth="600"
+             Foreground="{DynamicResource ControlDefaultForeground}">
     <UserControl.Resources>
         <Converters:IconToImageConverter x:Key="IconToImageConverter"/>
         <Converters:FileSizeFormatConverter x:Key="FileSizeFormatConverter"/>
         <Converters:FileNameToExtensionConverter x:Key="FileNameToExtensionConverter"/>
     </UserControl.Resources>
     <Grid Background="Transparent" MouseDown="Grid_MouseDown">
+        <Grid.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Open file" InputGestureText="Double Click" ToolTip="Opens the file with the default appplication. Double clicking also does the same." Click="ContextMenuCommands" Uid="OFI" Template="{DynamicResource SingleDropDownMenuItem}"/>
+                <MenuItem Header="Copy Path" ToolTip="Copies the path of this item to the clipboard" Click="ContextMenuCommands" Uid="CP" Template="{DynamicResource SingleDropDownMenuItem}"/>
+                <MenuItem Header="Open Location" ToolTip="Open the location of this item in File Explorer" Click="ContextMenuCommands" Uid="OF" Template="{DynamicResource SingleDropDownMenuItem}"/>
+            </ContextMenu>
+        </Grid.ContextMenu>
         <Image Source="{Binding Icon, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IconToImageConverter}}" HorizontalAlignment="Left" Width="32" Margin="0 4"/>
-        <controls:HighlightableTextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Selection="{Binding SelectedText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MouseDown="TextBlock_MouseDown" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="37,1,95,0" FontWeight="Bold" TextDecorations="{x:Null}" Cursor="Hand"/>
-        <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileNameToExtensionConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="40" Margin="0,1,0,0"/>
-        <TextBlock Text="{Binding SizeBytes, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileSizeFormatConverter}}" TextAlignment="Right" HorizontalAlignment="Right" VerticalAlignment="Top" Width="50" Margin="0,1,40,0"/>
-        <TextBlock Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="37,0,0,1"/>
+        <controls:HighlightableTextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Selection="{Binding SelectedText, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" ToolTip="{Binding Path=Text, RelativeSource={RelativeSource Self}}" VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="37,2,116,0" FontWeight="Bold"/>
+        <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileNameToExtensionConverter}}" TextAlignment="Right" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" HorizontalAlignment="Right" VerticalAlignment="Top" Width="42" Margin="0,2,0,0"/>
+        <TextBlock Text="{Binding SizeBytes, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource FileSizeFormatConverter}}" TextAlignment="Right" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" HorizontalAlignment="Right" VerticalAlignment="Top" Width="70" Margin="0,2,43,0"/>
+        <TextBlock Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}" ToolTip="{Binding Path=Text, RelativeSource={RelativeSource Self}}" TextAlignment="Left" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="37,0,0,2"/>
     </Grid>
 </UserControl>

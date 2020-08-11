@@ -1,19 +1,9 @@
 ﻿using FolderDeepSearch.FileOpener;
 using FolderDeepSearch.Files;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FolderDeepSearch.Search
 {
@@ -22,7 +12,7 @@ namespace FolderDeepSearch.Search
     /// </summary>
     public partial class SearchResultControl : UserControl
     {
-        SearchResultViewModel Result
+        private SearchResultViewModel Result
         {
             get => this.DataContext as SearchResultViewModel;
             set => this.DataContext = value;
@@ -35,7 +25,7 @@ namespace FolderDeepSearch.Search
 
         private bool PathExists()
         {
-            return Result.Path.IsFile() || Result.Path.IsDirectory();
+            return Result != null && (Result.Path.IsFile() || Result.Path.IsDirectory());
         }
 
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -44,10 +34,29 @@ namespace FolderDeepSearch.Search
                 Opener.OpenFile(Result.Path);
         }
 
-        private void TextBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        private void ContextMenuCommands(object sender, RoutedEventArgs e)
         {
-            if (PathExists())
-                Opener.OpenFile(Result.Path);
+            try
+            {
+                switch (((FrameworkElement)sender).Uid)
+                {
+                    case "OFI":
+                        if (PathExists())
+                            Opener.OpenFile(Result.Path);
+                        break;
+                    case "CP":
+                        if (PathExists())
+                            Clipboard.SetDataObject(Result.Path);
+                        break;
+                    case "OF":
+                        if (PathExists())
+                        {
+                            Process.Start("explorer.exe", "/select, \"" + Result.Path + "\"");
+                        }
+                        break;
+                }
+            }
+            catch { }
         }
     }
 }

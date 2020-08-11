@@ -92,7 +92,7 @@ namespace FolderDeepSearch.Helpers
 
                 if (!DeleteObject(hBitmap))
                 {
-                    MessageBox.Show("Failed to delete unused bitmap object");
+                    //MessageBox.Show("Failed to delete unused bitmap object");
                 }
 
                 return image;
