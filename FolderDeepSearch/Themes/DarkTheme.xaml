@@ -4416,7 +4416,7 @@
                 <WindowChrome CaptionHeight="26"
                               ResizeBorderThickness="6"
                               CornerRadius="0"
-                              GlassFrameThickness="0"
+                              GlassFrameThickness="1"
                               NonClientFrameEdges="None"
                               UseAeroCaptionButtons="False"/>
             </Setter.Value>
@@ -4424,7 +4424,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Window}">
-                    <Grid>
+                    <Grid Loaded="Grid_Loaded">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
@@ -4521,7 +4521,7 @@
                 <WindowChrome CaptionHeight="26"
                               ResizeBorderThickness="0"
                               CornerRadius="0"
-                              GlassFrameThickness="0"
+                              GlassFrameThickness="1"
                               NonClientFrameEdges="None"
                               UseAeroCaptionButtons="False"/>
             </Setter.Value>

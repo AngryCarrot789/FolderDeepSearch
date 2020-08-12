@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 
 namespace TheRThemes
 {
@@ -29,5 +31,14 @@ namespace TheRThemes
                 window.WindowState = WindowState.Maximized;
         }
         public void MinimizeWind(Window window) => window.WindowState = WindowState.Minimized;
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is Grid g && g.TemplatedParent is Window win)
+            {
+
+            }
+                //WindowDropShadows.DropShadowToWindow(win);
+        }
     }
 }

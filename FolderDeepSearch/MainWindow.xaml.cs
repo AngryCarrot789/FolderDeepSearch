@@ -41,6 +41,9 @@ namespace FolderDeepSearch
                 Height = Properties.Settings.Default.Height;
             }
             catch { }
+
+
+            //WindowDropShadows.DropShadowToWindow(this);
         }
     }
 }
