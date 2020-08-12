@@ -19,7 +19,11 @@
         <StackPanel Grid.Row="0" Height="107" VerticalAlignment="Top">
             <Grid Margin="0,0,0,5" Height="26" VerticalAlignment="Top">
                 <Label Content="Search for:" HorizontalAlignment="Left" Width="70" Padding="0 5 5 5"/>
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="The string of text to be searched" Height="26" Margin="70,0,105,0" TextWrapping="NoWrap" Padding="3" VerticalAlignment="Top" VerticalContentAlignment="Center"/>
+                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" ToolTip="The string of text to be searched" Height="26" Margin="70,0,105,0" TextWrapping="NoWrap" Padding="3" VerticalAlignment="Top" VerticalContentAlignment="Center">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding FindCommand}"/>
+                    </TextBox.InputBindings>
+                </TextBox>
                 <Button Command="{Binding FindCommand}" IsEnabled="{Binding IsSearching, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InvertedBoolConverter}}" Content="Search" HorizontalAlignment="Right" VerticalAlignment="Top" Width="100" Height="26" ToolTip="Search for the specific string of text (to the right)"/>
             </Grid>
             <Grid Margin="0,0,0,5" Height="26" VerticalAlignment="Top">
@@ -55,7 +59,7 @@
             </Grid>
         </StackPanel>
         <Separator VerticalAlignment="Top" Margin="0,112,0,0"/>
-        <Grid Margin="0,118,0,50">
+        <Grid Margin="0,118,0,75">
             <Label Content="Results:" HorizontalAlignment="Left" VerticalAlignment="Top"/>
             <ListBox Margin="0,26,0,0"
                      ItemsSource="{Binding FindResults, UpdateSourceTrigger=PropertyChanged}"
@@ -72,7 +76,7 @@
             <Button Command="{Binding ExportFilesToFolderCommand}" Content="Export Results to Folder" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,105,0" VerticalAlignment="Top" Width="150" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}" ToolTip="Copies all of the files found to a folder"/>
             <Button Command="{Binding ClearResultsCommand}" Content="Clear Results" BorderThickness="1 1 1 0" HorizontalAlignment="Right" Margin="0,1,0,0" VerticalAlignment="Top" Width="100" Height="25" BorderBrush="{DynamicResource ControlBrightDefaultBorderBrush}" ToolTip="Clear all of the results/items below"/>
         </Grid>
-        <Grid Height="50" VerticalAlignment="Bottom">
+        <Grid Height="75" VerticalAlignment="Bottom">
             <Grid VerticalAlignment="Top" Height="26">
                 <Label Content="Items Found:" HorizontalAlignment="Left" Padding="0 5 0 5"/>
                 <Label Content="{Binding FindResults.Count, UpdateSourceTrigger=PropertyChanged}" Margin="68,0,0,0" HorizontalAlignment="Left" Width="42"/>
@@ -87,7 +91,13 @@
                     <Label Content="{Binding FilesSearched, UpdateSourceTrigger=PropertyChanged}" Margin="83,0,0,0" Grid.Column="1"/>
                 </Grid>
             </Grid>
-            <ProgressBar IsIndeterminate="{Binding IsSearching, UpdateSourceTrigger=PropertyChanged}" Margin="0,26,0,0"/>
+            <Grid Margin="0,26,0,0" Height="25" VerticalAlignment="Top">
+                <Label Content="Searching File:" Padding="0 4" HorizontalAlignment="Left"/>
+                <TextBlock Text="{Binding CurrentlySearching, UpdateSourceTrigger=PropertyChanged}" TextTrimming="CharacterEllipsis" Padding="4" Margin="76,0,0,0"/>
+            </Grid>
+            <Grid Margin="0,51,0,0">
+                <ProgressBar IsIndeterminate="{Binding IsSearching, UpdateSourceTrigger=PropertyChanged}"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

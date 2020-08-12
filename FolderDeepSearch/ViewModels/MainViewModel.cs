@@ -45,6 +45,13 @@ namespace FolderDeepSearch.ViewModels
             set => RaisePropertyChanged(ref _searchText, value);
         }
 
+        private string _currentlySearching;
+        public string CurrentlySearching
+        {
+            get => _currentlySearching;
+            set => RaisePropertyChanged(ref _currentlySearching, value);
+        }
+
         private string _searchStartFolder;
         public string SearchStartFolder
         {
@@ -476,6 +483,7 @@ namespace FolderDeepSearch.ViewModels
         {
             try
             {
+                CurrentlySearching = file;
                 using (FileStream fileStream = File.OpenRead(file))
                 {
                     byte[] buffer = new byte[FileMaxReadSize];
@@ -491,7 +499,7 @@ namespace FolderDeepSearch.ViewModels
                     }
                 }
             }
-            catch(Exception e) { MessageBox.Show(e.Message + " -- Cancelling search."); CancelSearch(); }
+            catch (Exception e) { MessageBox.Show(e.Message + " -- Cancelling search."); CancelSearch(); }
         }
 
         public void SetSearchingStatus(bool isSearching)
