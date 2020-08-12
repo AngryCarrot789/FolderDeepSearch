@@ -214,8 +214,6 @@ namespace FolderDeepSearch.ViewModels
             CanSearch = false;
         }
 
-        // This method is absolutely huge ik but i cant
-        // be bothered to split it up into smaller ones lol
         public void Find()
         {
             try
@@ -239,228 +237,12 @@ namespace FolderDeepSearch.ViewModels
 
                             if (SearchRecursively)
                             {
-                                if (SearchPreferences == SearchPreference.FileContents)
-                                {
-                                    void DirSearch(string toSearchDir)
-                                    {
-                                        foreach (string directory in Directory.GetDirectories(toSearchDir))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            foreach (string filename in Directory.GetFiles(directory))
-                                            {
-                                                if (!CanSearch) return;
-
-                                                ReadAndSearchFileAsync(filename, searchText);
-                                                FilesSearched++;
-                                            }
-                                            FoldersSearched++;
-
-                                            DirSearch(directory);
-                                        }
-                                    }
-
-                                    DirSearch(SearchStartFolder);
-
-                                    foreach (string filename in Directory.GetFiles(SearchStartFolder))
-                                    {
-                                        if (!CanSearch) return;
-
-                                        ReadAndSearchFileAsync(filename, searchText);
-
-                                        FilesSearched++;
-                                    }
-                                }
-
-                                if (SearchPreferences == SearchPreference.File)
-                                {
-                                    void DirSearch(string toSearchDir)
-                                    {
-                                        foreach (string directory in Directory.GetDirectories(toSearchDir))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            foreach (string filename in Directory.GetFiles(directory))
-                                            {
-                                                if (!CanSearch) return;
-
-                                                if (GetFileName(filename).Contains(searchText))
-                                                    ResultsFoundAsync(filename, searchText);
-
-                                                FilesSearched++;
-                                            }
-                                            FoldersSearched++;
-
-                                            DirSearch(directory);
-                                        }
-                                    }
-
-                                    DirSearch(SearchStartFolder);
-
-                                    foreach (string filename in Directory.GetFiles(SearchStartFolder))
-                                    {
-                                        if (!CanSearch) return;
-
-                                        if (GetFileName(filename).Contains(searchText))
-                                            ResultsFoundAsync(filename, searchText);
-
-                                        FilesSearched++;
-                                    }
-                                }
-
-                                if (SearchPreferences == SearchPreference.Folder)
-                                {
-                                    void DirSearch(string toSearchDir)
-                                    {
-                                        foreach (string directory in Directory.GetDirectories(toSearchDir))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            string dirName = directory.GetDirectoryName();
-                                            if (dirName.Contains(searchText))
-                                                ResultsFoundAsync(directory, searchText);
-                                            FoldersSearched++;
-
-                                            DirSearch(directory);
-                                        }
-                                    }
-
-                                    DirSearch(SearchStartFolder);
-                                }
-
-                                if (SearchPreferences == SearchPreference.All)
-                                {
-                                    void DirSearch(string toSearchDir)
-                                    {
-                                        foreach (string directory in Directory.GetDirectories(toSearchDir))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            string dirName = directory.GetDirectoryName();
-                                            if (dirName.Contains(searchText))
-                                                ResultsFoundAsync(directory, searchText);
-
-                                            foreach (string filename in Directory.GetFiles(directory))
-                                            {
-                                                if (!CanSearch) return;
-
-                                                bool hasFoundFile = false;
-                                                if (GetFileName(filename).Contains(searchText))
-                                                {
-                                                    ResultsFoundAsync(filename, searchText);
-                                                    hasFoundFile = true;
-                                                }
-
-                                                if (!hasFoundFile)
-                                                {
-                                                    ReadAndSearchFileAsync(filename, searchText);
-                                                }
-
-                                                FilesSearched++;
-                                            }
-                                            FoldersSearched++;
-
-                                            DirSearch(directory);
-                                        }
-                                    }
-
-                                    DirSearch(SearchStartFolder);
-
-                                    foreach (string filename in Directory.GetFiles(SearchStartFolder))
-                                    {
-                                        if (!CanSearch) return;
-
-                                        bool hasFoundFile = false;
-                                        if (GetFileName(filename).Contains(searchText))
-                                        {
-                                            ResultsFoundAsync(filename, searchText);
-                                            hasFoundFile = true;
-                                        }
-
-                                        if (!hasFoundFile)
-                                        {
-                                            ReadAndSearchFileAsync(filename, searchText);
-                                        }
-
-                                        FilesSearched++;
-                                    }
-                                }
+                                StartSearchRecursive(searchText);
                             }
 
                             else
                             {
-                                switch (SearchPreferences)
-                                {
-                                    case SearchPreference.File:
-                                        foreach (string file in Directory.GetFiles(SearchStartFolder))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            if (GetFileName(file).Contains(searchText))
-                                                ResultsFoundAsync(file, searchText);
-
-                                            FilesSearched++;
-                                        }
-                                        break;
-
-                                    case SearchPreference.Folder:
-                                        foreach (string folder in Directory.GetDirectories(SearchStartFolder))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            string dirName = folder.GetDirectoryName();
-                                            if (dirName.Contains(searchText))
-                                                ResultsFoundAsync(folder, searchText);
-
-                                            FoldersSearched++;
-                                        }
-                                        break;
-
-                                    case SearchPreference.FileContents:
-                                        foreach (string file in Directory.GetFiles(SearchStartFolder))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            ReadAndSearchFileAsync(file, searchText);
-
-                                            FilesSearched++;
-                                        }
-                                        break;
-
-                                    case SearchPreference.All:
-                                        List<string> foundFiles = new List<string>();
-
-                                        foreach (string folder in Directory.GetDirectories(SearchStartFolder))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            string dirName = folder.GetDirectoryName();
-                                            if (dirName.Contains(searchText))
-                                                ResultsFoundAsync(folder, searchText);
-
-                                            FoldersSearched++;
-                                        }
-
-                                        foreach (string file in Directory.GetFiles(SearchStartFolder))
-                                        {
-                                            if (!CanSearch) return;
-
-                                            bool hasFoundFile = false;
-                                            if (GetFileName(file).Contains(searchText))
-                                            {
-                                                ResultsFoundAsync(file, searchText);
-                                                hasFoundFile = true;
-                                            }
-
-                                            if (!hasFoundFile)
-                                            {
-                                                ReadAndSearchFileAsync(file, searchText);
-                                            }
-
-                                            FilesSearched++;
-                                        }
-                                        break;
-                                }
+                                StartSearchNonRecursive(searchText);
                             }
 
                             SetSearchingStatus(false);
@@ -471,15 +253,200 @@ namespace FolderDeepSearch.ViewModels
             catch (Exception e) { MessageBox.Show(e.Message + " -- Cancelling search."); CancelSearch(); }
         }
 
-        public string GetFileName(string original)
+        #region Searching 
+
+        public void StartSearchRecursive(string searchText)
         {
-            if (IgnoreExtension)
-                return Path.GetFileNameWithoutExtension(original);
-            else
-                return Path.GetFileName(original);
+            switch (SearchPreferences)
+            {
+                case SearchPreference.File:
+                    {
+                        void DirectorySearch(string toSearchDir)
+                        {
+                            foreach (string directory in Directory.GetDirectories(toSearchDir))
+                            {
+                                if (!CanSearch) return;
+
+                                foreach (string filename in Directory.GetFiles(directory))
+                                {
+                                    if (!CanSearch) return;
+
+                                    SearchFileName(filename, searchText);
+                                }
+
+                                FoldersSearched++;
+
+                                DirectorySearch(directory);
+                            }
+                        }
+
+                        DirectorySearch(SearchStartFolder);
+
+                        foreach (string filename in Directory.GetFiles(SearchStartFolder))
+                        {
+                            if (!CanSearch) return;
+
+                            SearchFileName(filename, searchText);
+                        }
+                    }
+                    break;
+
+                case SearchPreference.Folder:
+                    {
+                        void DirectorySearch(string toSearchDir)
+                        {
+                            foreach (string directory in Directory.GetDirectories(toSearchDir))
+                            {
+                                if (!CanSearch) return;
+
+                                SearchFolderName(directory, searchText);
+
+                                DirectorySearch(directory);
+                            }
+                        }
+
+                        DirectorySearch(SearchStartFolder);
+                    }
+                    break;
+
+                case SearchPreference.FileContents:
+                    {
+                        void DirectorySearch(string toSearchDir)
+                        {
+                            foreach (string directory in Directory.GetDirectories(toSearchDir))
+                            {
+                                if (!CanSearch) return;
+
+                                foreach (string filename in Directory.GetFiles(directory))
+                                {
+                                    if (!CanSearch) return;
+
+                                    ReadAndSearchFileAsync(filename, searchText, true);
+                                }
+
+                                FoldersSearched++;
+
+                                DirectorySearch(directory);
+                            }
+                        }
+
+                        DirectorySearch(SearchStartFolder);
+
+                        foreach (string filename in Directory.GetFiles(SearchStartFolder))
+                        {
+                            if (!CanSearch) return;
+
+                            ReadAndSearchFileAsync(filename, searchText, true);
+                        }
+                    }
+                    break;
+
+                case SearchPreference.All:
+                    {
+                        void DirectorySearch(string toSearchDir)
+                        {
+                            foreach (string directory in Directory.GetDirectories(toSearchDir))
+                            {
+                                if (!CanSearch) return;
+
+                                SearchFolderName(directory, searchText);
+
+                                foreach (string filename in Directory.GetFiles(directory))
+                                {
+                                    if (!CanSearch) return;
+
+                                    bool hasFoundFile = false;
+                                    if (SearchFileName(filename, searchText))
+                                        hasFoundFile = true;
+
+                                    if (!hasFoundFile)
+                                    {
+                                        ReadAndSearchFileAsync(filename, searchText, false);
+                                    }
+                                }
+
+                                DirectorySearch(directory);
+                            }
+                        }
+
+                        DirectorySearch(SearchStartFolder);
+
+                        foreach (string filename in Directory.GetFiles(SearchStartFolder))
+                        {
+                            if (!CanSearch) return;
+
+                            bool hasFoundFile = false;
+                            if (SearchFileName(filename, searchText))
+                                hasFoundFile = true;
+
+                            if (!hasFoundFile)
+                                ReadAndSearchFileAsync(filename, searchText, false);
+                        }
+                    }
+                    break;
+            }
         }
 
-        public void ReadAndSearchFileAsync(string file, string searchText)
+        public void StartSearchNonRecursive(string searchText)
+        {
+            switch (SearchPreferences)
+            {
+                case SearchPreference.File:
+                    foreach (string file in Directory.GetFiles(SearchStartFolder))
+                    {
+                        if (!CanSearch) return;
+
+                        SearchFileName(file, searchText);
+                    }
+                    break;
+
+                case SearchPreference.Folder:
+                    foreach (string folder in Directory.GetDirectories(SearchStartFolder))
+                    {
+                        if (!CanSearch) return;
+
+                        SearchFolderName(folder, searchText);
+                    }
+                    break;
+
+                case SearchPreference.FileContents:
+                    foreach (string file in Directory.GetFiles(SearchStartFolder))
+                    {
+                        if (!CanSearch) return;
+
+                        ReadAndSearchFileAsync(file, searchText, true);
+                    }
+                    break;
+
+                case SearchPreference.All:
+                    foreach (string folder in Directory.GetDirectories(SearchStartFolder))
+                    {
+                        if (!CanSearch) return;
+
+                        SearchFolderName(folder, searchText);
+                    }
+
+                    foreach (string file in Directory.GetFiles(SearchStartFolder))
+                    {
+                        if (!CanSearch) return;
+
+                        bool hasFoundFile = false;
+                        if (GetFileName(file).Contains(searchText))
+                        {
+                            ResultsFoundAsync(file, searchText);
+                            hasFoundFile = true;
+                        }
+
+                        if (!hasFoundFile)
+                        {
+                            ReadAndSearchFileAsync(file, searchText, false);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        public void ReadAndSearchFileAsync(string file, string searchText, bool incrementSearchedFiles)
         {
             try
             {
@@ -498,13 +465,51 @@ namespace FolderDeepSearch.ViewModels
                         }
                     }
                 }
+                if (incrementSearchedFiles)
+                    FilesSearched++;
             }
             catch (Exception e) { MessageBox.Show(e.Message + " -- Cancelling search."); CancelSearch(); }
+        }
+
+        public bool SearchFileName(string name, string searchText)
+        {
+            CurrentlySearching = name;
+            if (GetFileName(name).Contains(searchText))
+            {
+                ResultsFoundAsync(name, searchText);
+                FilesSearched++;
+                return true;
+            }
+            FilesSearched++;
+            return false;
+        }
+
+        public bool SearchFolderName(string name, string searchText)
+        {
+            if (name.GetDirectoryName().Contains(searchText))
+            {
+                ResultsFoundAsync(name, searchText);
+                FoldersSearched++;
+                return true;
+            }
+            FoldersSearched++;
+            return false;
+        }
+
+        #endregion
+
+        public string GetFileName(string original)
+        {
+            if (IgnoreExtension)
+                return Path.GetFileNameWithoutExtension(original);
+            else
+                return Path.GetFileName(original);
         }
 
         public void SetSearchingStatus(bool isSearching)
         {
             IsSearching = isSearching;
+            CurrentlySearching = "";
         }
 
         public void ResultsFoundAsync(string path, string selectionText)
