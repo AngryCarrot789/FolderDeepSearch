@@ -430,12 +430,7 @@ namespace FolderDeepSearch.ViewModels
                     {
                         if (!CanSearch) return;
 
-                        bool hasFoundFile = false;
-                        if (GetFileName(file).Contains(searchText))
-                        {
-                            ResultsFoundAsync(file, searchText);
-                            hasFoundFile = true;
-                        }
+                        bool hasFoundFile = SearchFileName(file, searchText);
 
                         if (!hasFoundFile)
                         {
@@ -474,9 +469,10 @@ namespace FolderDeepSearch.ViewModels
         public bool SearchFileName(string name, string searchText)
         {
             CurrentlySearching = name;
-            if (GetFileName(name).Contains(searchText))
+            string newName = IsCaseSensitive ? name : name.ToLower();
+            if (GetFileName(newName).Contains(searchText))
             {
-                ResultsFoundAsync(name, searchText);
+                ResultsFoundAsync(newName, searchText);
                 FilesSearched++;
                 return true;
             }
@@ -486,9 +482,10 @@ namespace FolderDeepSearch.ViewModels
 
         public bool SearchFolderName(string name, string searchText)
         {
-            if (name.GetDirectoryName().Contains(searchText))
+            string newName = IsCaseSensitive ? name : name.ToLower();
+            if (newName.GetDirectoryName().Contains(searchText))
             {
-                ResultsFoundAsync(name, searchText);
+                ResultsFoundAsync(newName, searchText);
                 FoldersSearched++;
                 return true;
             }
